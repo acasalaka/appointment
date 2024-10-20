@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+  <title>Appointment Detail</title>
 </head>
+
 <body>
-$END$
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+  <div class="row justify-content-center my-4">
+    <div class="card">
+      <div class="card-header" style="background-color: #6C2BA1; color: white; border-radius: 10px; width: auto">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Appointment Detail</h4>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Main form for submitting appointment details -->
+        <form th:action="@{/appointment/note}" method="POST" th:object="${appointmentDTO}">
+          <input type="hidden" th:field="*{id}" />
+
+          <div class="row mb-3">
+            <label for="diagnosis" class="fw-bold col-sm-4">Diagnosis</label>
+            <div class="col-sm-8">
+              <textarea class="form-control" id="diagnosis" name="diagnosis" rows="3" th:field="*{diagnosis}"></textarea>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Treatment(s)</th>
+                <th class="d-flex justify-content-end">
+                  <button type="submit" name="addTreatment" class="btn btn-info">Add Treatment</button>
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="treatment, iterStat : ${appointmentDTO.treatments}">
+                <td>
+                  <select id="treatments" class="form-control mb-2" th:field="*{treatments[__${iterStat.index}__].id}">
+                    <option value="" disabled selected>Select a treatment</option>
+                    <option th:each="treatmentOption : ${treatmentList}" th:value="${treatmentOption.id}" th:text="${treatmentOption.name}"></option>
+                  </select>
+                </td>
+                <td>
+                  <!-- Delete Treatment button inside main form -->
+                  <button class="btn btn-danger" type="submit" name="deleteTreatment" value="${iterStat.index}">Delete</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="text-center my-4">
+            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

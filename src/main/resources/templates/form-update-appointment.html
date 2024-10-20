@@ -1,10 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+    <title>Update Appointment</title>
 </head>
+
 <body>
-$END$
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+    <div class="text-center my-4">
+        <h2>Update Appointment</h2>
+    </div>
+    <div class="row justify-content-center">
+        <div class="card" style="width: 60rem;">
+            <div class="card-body">
+                <form th:action="@{/appointment/update}" th:object="${appointmentDTO}" method="POST">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id" class="form-label">ID</label>
+                            <input type="text" id="id" class="form-control" th:field="*{id}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="doctor" class="form-label">Doctor</label>
+                            <select class="form-control" id="doctor" name="doctor" th:field="*{doctorId}" required>
+                                <option value="" disabled selected th:text="'Select Doctor'">Select Doctor</option>
+                                <option th:each="doctor: ${listDoctor}" th:value="${doctor.id}" th:text="${doctor.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row my-3">
+                        <div class="col-md-6">
+                            <label for="appointmentDate">Choose an appointment date:</label>
+                            <select id="appointmentDate" th:field="*{date}" class="form-control" name="appointmentDate" required>
+                                <option value="" disabled selected>Select a date</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row my-3 text-center">
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary me-2">Submit</button>
+                            <a type="button" class="btn btn-md btn-danger" th:href="@{/appointment/all}">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('doctor').addEventListener('change', function() {
+        const doctorId = this.value;
+        const appointmentDate = document.getElementById('appointmentDate');
+
+        appointmentDate.innerHTML = '<option value="">Select a date</option>';
+
+        if (doctorId) {
+            fetch(`/appointment/available-dates?doctorId=${doctorId}`)
+                .then(response => response.json())
+                .then(dates => {
+                    dates.forEach(date => {
+                        const option = document.createElement('option');
+
+                        option.value = new Date(date).toISOString().split('T')[0];
+
+                        option.textContent = new Date(date).toLocaleDateString('en-GB', {
+                            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                        });
+
+                        appointmentDate.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching available dates:', error);
+                });
+        }
+    });
+</script>
+
 </body>
+
 </html>

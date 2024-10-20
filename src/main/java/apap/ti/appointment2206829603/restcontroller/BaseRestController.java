@@ -1,4 +1,4 @@
-package apap.ti.insurance2206827592.restcontroller;
+package apap.ti.appointment2206829603.restcontroller;
 
 import apap.ti.appointment2206829603.restdto.response.BaseResponseDTO;
 import org.springframework.http.HttpStatus;

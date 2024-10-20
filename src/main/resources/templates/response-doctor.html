@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag "></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag "></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag "></object>
+  <title th:text="${title}"></title>
 </head>
+
 <body>
-$END$
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<div class="container">
+  <div class="card m-4 p-4">
+    <div class="card-body">
+      <div class="text-center">
+        <h2 th:class="${isError} ? 'text-danger' : 'text-success'" th:text="${responseMessage}"></h2>
+      </div>
+
+      <div th:if="${isError}" class="text-center text-danger">
+        <ul>
+          <li th:each="error : ${errors}" th:text="${error.defaultMessage}"></li>
+        </ul>
+      </div>
+
+      <div class="text-center m-3">
+        <a type="button" class="btn btn-md btn-primary" href="/">Home</a>
+        <a type="button" class="btn btn-md btn-primary" href="/doctor/all">View All Doctor</a>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
+
 </html>
