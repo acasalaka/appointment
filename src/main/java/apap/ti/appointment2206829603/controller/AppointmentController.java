@@ -13,7 +13,6 @@ import apap.ti.appointment2206829603.service.DoctorService;
 import apap.ti.appointment2206829603.service.PatientService;
 import apap.ti.appointment2206829603.service.TreatmentService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,17 +28,20 @@ import java.util.stream.Collectors;
 @Controller
 public class AppointmentController {
 
-    @Autowired
-    AppointmentService appointmentService;
+    private final AppointmentService appointmentService;
 
-    @Autowired
-    DoctorService doctorService;
+    private final DoctorService doctorService;
 
-    @Autowired
-    PatientService patientService;
+    private final PatientService patientService;
 
-    @Autowired
-    TreatmentService treatmentService;
+    private final TreatmentService treatmentService;
+
+    public AppointmentController(AppointmentService appointmentService, DoctorService doctorService, PatientService patientService, TreatmentService treatmentService) {
+        this.appointmentService = appointmentService;
+        this.doctorService = doctorService;
+        this.patientService = patientService;
+        this.treatmentService = treatmentService;
+    }
 
     @GetMapping("/")
     public String home(Model model) {

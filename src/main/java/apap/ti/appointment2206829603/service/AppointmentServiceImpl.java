@@ -3,7 +3,6 @@ package apap.ti.appointment2206829603.service;
 import apap.ti.appointment2206829603.model.Appointment;
 import apap.ti.appointment2206829603.model.Doctor;
 import apap.ti.appointment2206829603.repository.AppointmentDb;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
-    @Autowired
-    AppointmentDb appointmentDb;
+    private final AppointmentDb appointmentDb;
+
+    public AppointmentServiceImpl(AppointmentDb appointmentDb) {
+        this.appointmentDb = appointmentDb;
+    }
 
     @Override
     public void createAppointment(Appointment appointment) {
