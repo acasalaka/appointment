@@ -15,4 +15,5 @@ public interface AppointmentService {
     List<Date> getNextAvailableDates(Doctor doctor);
     Appointment updateAppointment(Appointment appointment);
     List<Appointment> getTodaysAppointments();
+    List<Appointment> getAppointmentsInDateRange(Date startDate, Date endDate);
 }

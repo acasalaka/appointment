@@ -122,4 +122,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Appointment> getAppointmentsInDateRange(Date startDate, Date endDate) {
+        List<Appointment> allAppointments = appointmentDb.findAllByDeletedAtIsNull(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
+
+        return allAppointments.stream()
+                .filter(appointment -> !appointment.getDate().before(startDate) && !appointment.getDate().after(endDate))
+                .collect(Collectors.toList());
+    }
 }
