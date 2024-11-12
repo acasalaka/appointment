@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+    <title>Patient Not Found</title>
+</head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+    <div class="text-center my-4">
+    </div>
+    <div class="row justify-content-center">
+        <div class="card" style="width: 60rem;">
+            <div class="card-body" style="text-align: center">
+                <div>
+
+                    <h2>Patient Not Found</h2>
+                    <div>
+                        <a th:text="|Patient not found.|"></a>
+                    </div>
+                    <a>Please insert as a new patient before making the appointment.</a>
+
+                    <div class="text-center m-3">
+                        <a class="btn btn-primary" th:href="@{/appointment/create-with-patient}">Insert New Patient</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

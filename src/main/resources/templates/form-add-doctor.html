@@ -1,10 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+  <title>New Doctor</title>
 </head>
+
 <body>
-$END$
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<div class="container">
+  <div class="text-center my-4">
+    <h2>New Doctor</h2>
+  </div>
+  <div class="row justify-content-center">
+    <div class="card" style="width: 60rem;">
+      <div class="card-body">
+        <form th:action="@{/doctor/create}" th:object="${doctorDTO}" method="POST">
+
+          <div class="row my-3">
+            <div class="col-md-6">
+              <label for="doctor-name" class="form-label">Name</label>
+              <input class="form-control" type="text" id="doctor-name" th:field="*{name}" placeholder="Name" required />
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input class="form-control" type="email" id="email" th:field="*{email}" placeholder="Email" required />
+            </div>
+          </div>
+
+          <div class="row my-3">
+            <div class="col-md-6">
+              <label class="form-label">Gender</label>
+              <div class="d-flex">
+                <div class="form-check me-3">
+                  <input class="form-check-input" type="radio" id="male" name="gender" th:field="*{gender}" value="true" />
+                  <label class="form-check-label" for="male">Male</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="female" name="gender" th:field="*{gender}" value="false" />
+                  <label class="form-check-label" for="female">Female</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="specialist" class="form-label">Specialization</label>
+              <select class="form-control" id="specialist" th:field="*{specialist}" required>
+                <option value="-1" disabled selected>Choose specialization...</option>
+                <option value="0">Dokter umum (dr.)</option>
+                <option value="1">Dokter gigi (drg.)</option>
+                <option value="2">Spesialis Anak (Sp.A)</option>
+                <option value="3">Bedah (Sp.B)</option>
+                <option value="4">Bedah Plastik, Rekonstruksi, dan Estetik (Sp.BP-RE)</option>
+                <option value="5">Jantung dan Pembuluh Darah (Sp.JP)</option>
+                <option value="6">Kulit dan Kelamin (Sp.KK)</option>
+                <option value="7">Mata (Sp.M)</option>
+                <option value="8">Obstetri dan Ginekologi (Sp.OG)</option>
+                <option value="9">Penyakit Dalam (Sp.PD)</option>
+                <option value="10">Paru (Sp.P)</option>
+                <option value="11">Telinga, Hidung, Tenggorokan, Bedah Kepala Leher (Sp.THT-KL)</option>
+                <option value="12">Radiologi (Sp.Rad)</option>
+                <option value="13">Kesehatan Jiwa (Sp.KJ)</option>
+                <option value="14">Anestesi (Sp.An)</option>
+                <option value="15">Neurologi (Sp.N)</option>
+                <option value="16">Urologi (Sp.U)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row my-3">
+            <div class="col-md-6">
+              <label for="experience" class="form-label">Years of Experience</label>
+              <input class="form-control" type="number" id="experience" th:field="*{yearsOfExperience}" placeholder="Years of Experience" required />
+            </div>
+            <div class="col-md-6">
+              <label for="fee" class="form-label">Fee</label>
+              <input class="form-control" type="number" id="fee" th:field="*{fee}" placeholder="Fee" required />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Schedules</label>
+            <div class="d-flex justify-content-between">
+              <div>
+                <div th:each="schedule, iterStat : *{schedules}">
+                  <div class="input-group mb-2">
+                    <select class="form-select" th:field="*{schedules[__${iterStat.index}__]}" required>
+                      <option value="" disabled selected>Choose the day...</option>
+                      <option value="1">Monday</option>
+                      <option value="2">Tuesday</option>
+                      <option value="3">Wednesday</option>
+                      <option value="4">Thursday</option>
+                      <option value="5">Friday</option>
+                      <option value="6">Saturday</option>
+                      <option value="7">Sunday</option>
+                    </select>
+                    <button class="btn btn-danger" type="submit" th:name="deleteSchedule" th:value="${iterStat.index}">Delete</button>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <button class="btn btn-primary" type="submit" name="addSchedule">Add Schedule</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center my-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a class="btn btn-danger" href="/doctor/all">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
+
 </html>

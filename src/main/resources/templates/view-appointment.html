@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+  <title>Appointment Detail</title>
+</head>
+
+<body>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+  <div class="row justify-content-center my-4">
+    <div class="card">
+      <div class="card-header" style="background-color: #6C2BA1; color: white; border-radius: 10px; width: auto">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Appointment Detail</h4>
+          <div>
+            <button type="button"
+                    class="btn [[${appointment.status == 0} ? 'btn-success' : (appointment.status == 1 ? 'btn-secondary' : 'btn-danger')]]"
+                    disabled>
+              [[${appointment.statusString(appointment.status)}]]
+            </button>
+
+            <form th:action="@{/appointment/{idAppointment}/done(idAppointment=${appointment.id})}" method="POST" th:if="${appointment.status == 0}" class="d-inline-block">
+              <button type="submit" class="btn btn-outline-primary me-2">Mark as Done</button>
+            </form>
+
+            <a type="button" class="btn btn-primary me-2"
+               th:href="@{/appointment/{idAppointment}/update(idAppointment=${appointment.id})}">
+              Update
+            </a>
+
+            <form th:action="@{/appointment/{idAppointment}/cancel(idAppointment=${appointment.id})}" method="POST" th:if="${appointment.status == 0}" class="d-inline-block">
+              <button type="submit" class="btn btn-warning me-2">Cancel</button>
+            </form>
+
+            <a type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAppointmentModal">
+              Delete
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">ID:</p>
+          <p class="col-sm-8" th:text="${appointment.id}"></p>
+        </div>
+
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">Patient:</p>
+          <p class="col-sm-8" th:text="${appointment.patient.name}"></p>
+        </div>
+
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">Doctor:</p>
+          <p class="col-sm-8" th:text="${appointment.doctor.name}"></p>
+        </div>
+
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">Appointment Date:</p>
+          <p class="col-sm-8" th:text="${#dates.format(appointment.date, 'dd MMMM yyyy')}"></p>
+        </div>
+
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">Created At:</p>
+          <p class="col-sm-8" th:text="${#dates.format(appointment.createdAt, 'dd MMMM yyyy HH:mm')}"></p>
+        </div>
+
+        <div class="row mb-3">
+          <p class="fw-bold col-sm-4">Updated At:</p>
+          <p class="col-sm-8" th:text="${#dates.format(appointment.updatedAt, 'dd MMMM yyyy HH:mm')}"></p>
+        </div>
+
+        <label for="diagnosis" class="form-label">Diagnosis</label>
+        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="3"
+                  th:text="${appointment.diagnosis != null ? appointment.diagnosis : 'No records yet.'}" readonly>
+        </textarea>
+
+        <label class="form-label">Treatments</label>
+        <div th:if="${appointment.treatments != null and appointment.treatments.size() > 0}">
+        <span th:each="treatment, iterStat : ${appointment.treatments}">
+          <span th:text="${treatment.name}"></span><span th:if="${!iterStat.last}">, </span>
+        </span>
+        </div>
+        <div th:if="${appointment.treatments == null or appointment.treatments.size() == 0}">
+          <p>No treatments available.</p>
+        </div>
+
+        <div th:if="${appointment.treatments == null or appointment.treatments.size() == 0}">
+          <input type="text" class="form-control no-records" value="No treatments yet." readonly/>
+        </div>
+
+        <div class="text-center my-4">
+          <a class="btn btn-primary"
+             th:href="@{/appointment/{idAppointment}/note(idAppointment=${appointment.id})}">
+            Add Diagnosis & Treatments
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this appointment?
+      </div>
+      <div class="modal-footer">
+        <form th:action="@{/appointment/delete}" method="POST">
+          <input type="hidden" name="id" th:value="${appointment.id}">
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

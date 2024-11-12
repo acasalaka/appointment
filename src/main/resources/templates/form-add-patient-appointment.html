@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New Patient & Appointment</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+</head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+  <div class="text-center my-4">
+    <h2>New Patient & Appointment</h2>
+  </div>
+  <div class="row justify-content-center">
+    <div class="card" style="width: 60rem;">
+      <div class="card-body">
+        <form th:action="@{|/appointment/create-with-patient|}" th:object="${appointmentDTO}" method="POST">
+
+          <div class="row">
+            <div class="col-md-6">
+              <label for="doctor-name" class="form-label">Name</label>
+              <input class="form-control" type="text" id="doctor-name" th:field="*{patient.name}" placeholder="Name" required />
+            </div>
+            <div class="col-md-6">
+              <label for="nik" class="form-label">NIK</label>
+              <input class="form-control" type="text" id="nik" th:field="*{patient.nik}" placeholder="NIK" required />
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input class="form-control" type="email" id="email" th:field="*{patient.email}" placeholder="Email" required />
+            </div>
+            <div class="col-md-6">
+              <label for="dob" class="form-label">Birth Date</label>
+              <input class="form-control" type="date" id="dob" th:field="*{patient.birthDate}" placeholder="Birth Date" required />
+            </div>
+            <div class="col-md-6">
+              <label for="birthPlace" class="form-label">Birth Place</label>
+              <input class="form-control" type="text" id="birthPlace" th:field="*{patient.birthPlace}" placeholder="Birth Place" required />
+            </div>
+          </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Gender</label>
+            <div class="d-flex">
+              <div class="form-check me-3">
+                <input class="form-check-input" type="radio" id="male" name="gender" th:field="*{patient.gender}" value="true" />
+                <label class="form-check-label" for="male">Male</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="female" name="gender" th:field="*{patient.gender}" value="false" />
+                <label class="form-check-label" for="female">Female</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          </br>
+          <hr>
+          </br>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label for="doctor" class="form-label">Doctor</label>
+              <select class="form-control" id="doctor" name="doctor" th:field="*{doctorId}" required>
+                <option value="" disabled selected th:text="'Select Doctor'">Select Doctor</option>
+                <option th:each="doctor: ${listDoctor}" th:value="${doctor.id}" th:text="${doctor.name}"></option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="appointmentDate">Choose an appointment date:</label>
+              <select id="appointmentDate" th:field="*{date}" class="form-control" name="appointmentDate" required>
+                <option value="" disabled selected>Select a date</option>
+              </select>
+            </div>
+          </div>
+
+          </br>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Create Patient & Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('doctor').addEventListener('change', function() {
+    const doctorId = this.value;
+    const appointmentDate = document.getElementById('appointmentDate');
+
+    appointmentDate.innerHTML = '<option value="">Select a date</option>';
+
+    if (doctorId) {
+      fetch(`/appointment/available-dates?doctorId=${doctorId}`)
+              .then(response => response.json())
+              .then(dates => {
+                dates.forEach(dateString => {
+                  const date = new Date(dateString);
+
+                  const formattedDate = date.toLocaleDateString('en-GB', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                  });
+
+                  const option = document.createElement('option');
+                  option.value = date.toISOString().split('T')[0];
+                  option.textContent = formattedDate;
+
+                  appointmentDate.appendChild(option);
+                });
+              })
+              .catch(error => {
+                console.error('Error fetching available dates:', error);
+              });
+    }
+  });
+</script>
+
+</body>
+</html>
