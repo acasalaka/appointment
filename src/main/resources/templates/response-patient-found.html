@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Found</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+</head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+  <div class="text-center my-4">
+    <h2>Patient Found</h2>
+  </div>
+  <div class="row justify-content-center">
+    <div class="card" style="width: 40rem; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+            <label for="nik" class="form-label">NIK</label>
+            <input type="text" id="nik" class="form-control" th:value="${patient.nik}" readonly>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" class="form-control" th:value="${patient.name}" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <input type="text" id="gender" class="form-control" th:value="${patient.assignGender()}" readonly>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <label for="dob" class="form-label">Date of Birth</label>
+            <input type="text" id="dob" class="form-control" th:value="${#dates.format(patient.birthDate, 'dd-MM-yyyy')}" readonly>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <a class="btn btn-primary" th:href="@{/appointment/{nik}/create(nik=${patient.nik})}">Create Appointment</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

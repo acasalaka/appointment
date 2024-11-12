@@ -7,7 +7,6 @@
   <object th:include="~{fragments/common :: css}" th:remove="tag "></object>
   <object th:include="~{fragments/common :: bootstrap}" th:remove="tag "></object>
 
-  <title>Error</title>
 </head>
 
 <body>
@@ -16,15 +15,14 @@
   <div class="card m-4 p-4">
     <div class="card-body">
       <div class="text-center">
-        <h2 style="color: red;">Aksi Gagal</h2>
+        <h2 th:text="${responseMessage}"></h2>
       </div>
-      <h3 th:text="${errorMessage}"></h3>
-    </div>
-    <div class="text-center m-3">
-      <a type="button" class="btn btn-md btn-primary" href="/">Home</a>
+      <div class="text-center m-3">
+        <a type="button" class="btn btn-md btn-primary" href="/">Home</a>
+        <a type="button" class="btn btn-md btn-primary" href="/appointment/all">View All Appointment</a>
+      </div>
     </div>
   </div>
-</div>
 </div>
 </body>
 

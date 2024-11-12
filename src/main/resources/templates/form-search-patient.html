@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search Patient</title>
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: bootstrap}" th:remove="tag"></object>
+</head>
+<body>
+
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+<div class="container">
+  <div class="text-center my-4">
+    <h2>Search Patient</h2>
+  </div>
+  <div class="row justify-content-center">
+    <div class="card" style="width: 60rem;">
+      <div class="card-body">
+          <form id="searchPatientForm" onsubmit="submitForm(event)">
+            <div class="row mb-3">
+              <div class="mb-3">
+                <label for="nik" class="form-label fw-bold">NIK</label>
+                <input class="form-control" type="text" id="nik" name="nik"
+                       placeholder="NIK" required />
+              </div>
+            </div>
+
+            <div class="text-center m-3">
+              <a class="btn btn-danger" href="/appointment/all">Back</a>
+              <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function submitForm(event) {
+    event.preventDefault();
+
+    var nik = document.getElementById("nik").value;
+
+    window.location.href = "/patient/search/" + nik;
+  }
+</script>
+</body>
+</html>
