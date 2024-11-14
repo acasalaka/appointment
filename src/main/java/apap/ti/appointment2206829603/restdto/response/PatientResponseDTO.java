@@ -19,6 +19,7 @@ public class PatientResponseDTO {
     private String name;
     private boolean gender;
     private String email;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
     private String birthPlace;
     private List<Appointment> appointments;

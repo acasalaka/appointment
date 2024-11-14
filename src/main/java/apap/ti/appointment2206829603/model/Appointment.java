@@ -1,6 +1,5 @@
 package apap.ti.appointment2206829603.model;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 @Getter
 @Setter
@@ -27,11 +25,11 @@ public class Appointment {
     private String id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idDoctor", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_doctor", referencedColumnName = "id", nullable = false)
     private Doctor doctor;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idPatient", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_patient", referencedColumnName = "id", nullable = false)
     private Patient patient;
 
     @NotNull
@@ -43,12 +41,12 @@ public class Appointment {
     private String diagnosis;
 
     @ManyToMany
-    @JoinTable(name = "treatmentOnAppointment", joinColumns = @JoinColumn(name = "idAppointment"),
-            inverseJoinColumns = @JoinColumn(name = "idTreatment"))
+    @JoinTable(name = "treatment_on_appointment", joinColumns = @JoinColumn(name = "id_appointment"),
+            inverseJoinColumns = @JoinColumn(name = "id_treatment"))
     private List<Treatment> treatments;
 
     @NotNull
-    @Column(name = "totalFee", nullable = false)
+    @Column(name = "total_fee", nullable = false)
     private Long totalFee;
 
     @NotNull
@@ -60,16 +58,17 @@ public class Appointment {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createdAt", updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private Date createdAt;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updatedAt", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
-    @Column(name = "deletedAt")
-    private Date deletedAt;
+    @NotNull
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
 
     public String generateAppointmentId() {
         if (this.date == null) {
