@@ -1,9 +1,7 @@
 package apap.ti.appointment2206829603;
 
-import apap.ti.appointment2206829603.model.Appointment;
 import apap.ti.appointment2206829603.model.Doctor;
 import apap.ti.appointment2206829603.model.Patient;
-import apap.ti.appointment2206829603.model.Treatment;
 import apap.ti.appointment2206829603.service.AppointmentService;
 import apap.ti.appointment2206829603.service.DoctorService;
 import apap.ti.appointment2206829603.service.PatientService;
@@ -80,31 +78,6 @@ public class Appointment2206829603Application {
 			patientService.createPatient(patient);
 
 			treatmentService.insertTreatmentData();
-//			var appointment = new Appointment();
-//
-//			List<Doctor> doctorList = doctorService.getAllDoctors();
-//			int randomDoctor = random.nextInt(doctorList.size());
-//			Doctor doctorAppt = doctorList.get(randomDoctor);
-//			appointment.setPatient(patient);
-//			appointment.setDoctor(doctorAppt);
-//			appointment.setId(appointment.generateAppointmentId(appointment.getDoctor()));
-//			appointment.setDiagnosis("No diagnosis yet");
-//
-//			treatmentService.insertTreatmentData();
-//
-//			List<Treatment> availableTreatments = treatmentService.getAllTreatments();
-//			Treatment treatment = availableTreatments.get(random.nextInt(33));
-//			List<Treatment> treatments = new ArrayList<Treatment>();
-//			treatments.add(treatment);
-//			appointment.setTreatments(treatments);
-//			appointment.setTotalFee(appointment.getDoctor().getFee());
-//			appointment.setStatus(0);
-//
-//			int randomIndex = random.nextInt(appointmentService.getNextAvailableDates(doctorAppt).size());
-//			Date date = appointmentService.getNextAvailableDates(doctorAppt).get(randomIndex);
-//			appointment.setDate(date);
-//
-//			appointmentService.createAppointment(appointment);
 		};
 	}
 }

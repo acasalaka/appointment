@@ -29,7 +29,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Appointment> getAllAppointments() {
         Sort sortByName = Sort.by(Sort.Order.by("doctor.name").ignoreCase());
-        return appointmentDb.findAllByDeletedAtIsNull(sortByName);
+        return appointmentDb.findAllByIsDeletedFalse(sortByName);
     };
 
     @Override
@@ -47,7 +47,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void deleteAppointment(Appointment appointment) {
-        appointment.setDeletedAt(new Date());
+        appointment.setDeleted(true);
         appointmentDb.save(appointment);
     }
 
@@ -106,7 +106,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         todayCal.set(Calendar.MILLISECOND, 0);
         Date today = todayCal.getTime();
 
-        List<Appointment> allAppointments = appointmentDb.findAllByDeletedAtIsNull(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
+        List<Appointment> allAppointments = appointmentDb.findAllByIsDeletedFalse(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
 
         return allAppointments.stream()
                 .filter(appointment -> {
@@ -125,7 +125,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<Appointment> getAppointmentsInDateRange(Date startDate, Date endDate) {
-        List<Appointment> allAppointments = appointmentDb.findAllByDeletedAtIsNull(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
+        List<Appointment> allAppointments = appointmentDb.findAllByIsDeletedFalse(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
 
         return allAppointments.stream()
                 .filter(appointment -> !appointment.getDate().before(startDate) && !appointment.getDate().after(endDate))

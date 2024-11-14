@@ -3,23 +3,19 @@ package apap.ti.appointment2206829603.restservice;
 import apap.ti.appointment2206829603.model.Appointment;
 import apap.ti.appointment2206829603.model.Doctor;
 import apap.ti.appointment2206829603.model.Patient;
+import apap.ti.appointment2206829603.model.Treatment;
 import apap.ti.appointment2206829603.repository.AppointmentDb;
 import apap.ti.appointment2206829603.repository.DoctorDb;
 import apap.ti.appointment2206829603.repository.PatientDb;
 import apap.ti.appointment2206829603.restdto.request.AddAppointmentRequestRestDTO;
 import apap.ti.appointment2206829603.restdto.response.AppointmentResponseDTO;
 import apap.ti.appointment2206829603.restdto.response.AppointmentStatisticsResponseDTO;
-import apap.ti.appointment2206829603.service.AppointmentService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -36,7 +32,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
 
     @Override
     public AppointmentStatisticsResponseDTO getAppointmentStatistics(String period, Integer year) {
-        var allAppointments = appointmentDb.findAllByDeletedAtIsNull(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
+        var allAppointments = appointmentDb.findAllByIsDeletedFalse(Sort.by(Sort.Order.by("doctor.name").ignoreCase()));
 
         int januaryCount = 0;
         int februaryCount = 0;
@@ -167,11 +163,29 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
     }
 
     @Override
-    public AppointmentResponseDTO getAppointmentById(String id) throws EntityNotFoundException {
-        Appointment appointmentToView = appointmentDb.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
+    public List<AppointmentResponseDTO> getAllAppointments() {
 
-        return appointmentToAppointmentResponseDTO(appointmentToView);
+        Sort sortByName = Sort.by(Sort.Order.by("doctor.name").ignoreCase());
+        var listAppointment = appointmentDb.findAllByIsDeletedFalse(sortByName);
+        System.out.println("total appointments: " + listAppointment.size());
+        var listAppointmentResponseDTO = new ArrayList<AppointmentResponseDTO>();
+        listAppointment.forEach(appointment -> {
+            var appointmentResponseDTO = appointmentToAppointmentResponseDTO(appointment);
+            listAppointmentResponseDTO.add(appointmentResponseDTO);
+        });
+
+        return listAppointmentResponseDTO;
+    }
+
+    @Override
+    public AppointmentResponseDTO getAppointmentById(String id) {
+        var appointment = appointmentDb.findByIdAndIsDeletedFalse(id).orElse(null);
+        System.out.println(appointment.getId());
+        if (appointment == null) {
+            return null;
+        }
+
+        return appointmentToAppointmentResponseDTO(appointment);
     }
 
     @Override
@@ -201,12 +215,16 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
     public AppointmentResponseDTO appointmentToAppointmentResponseDTO(Appointment appointment) {
         AppointmentResponseDTO responseDTO = new AppointmentResponseDTO();
         responseDTO.setId(appointment.getId());
-        responseDTO.setDoctor(appointment.getDoctor());
-        responseDTO.setPatient(appointment.getPatient());
+        responseDTO.setDoctor(appointment.getDoctor().getName());
+        responseDTO.setPatient(appointment.getPatient().getName());
         responseDTO.setDate(appointment.getDate());
         responseDTO.setDiagnosis(appointment.getDiagnosis());
         responseDTO.setTotalFee(appointment.getTotalFee());
-        responseDTO.setTreatments(appointment.getTreatments());
+        List<String> treatments = new ArrayList<>();
+        for (Treatment treatment : appointment.getTreatments()) {
+            treatments.add(treatment.getName());
+        }
+        responseDTO.setTreatments(treatments);
         responseDTO.setStatus(appointment.getStatus());
         responseDTO.setCreatedAt(appointment.getCreatedAt());
         responseDTO.setUpdatedAt(appointment.getUpdatedAt());
