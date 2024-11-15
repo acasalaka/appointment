@@ -40,10 +40,10 @@ public class Appointment {
     @Column(name = "diagnosis", nullable = false)
     private String diagnosis;
 
-    @ManyToMany
-    @JoinTable(name = "treatment_on_appointment", joinColumns = @JoinColumn(name = "id_appointment"),
-            inverseJoinColumns = @JoinColumn(name = "id_treatment"))
-    private List<Treatment> treatments;
+//    @ManyToMany
+//    @JoinTable(name = "treatment_on_appointment", joinColumns = @JoinColumn(name = "id_appointment"),
+//            inverseJoinColumns = @JoinColumn(name = "id_treatment"))
+//    private List<Treatment> treatments;
 
     @NotNull
     @Column(name = "total_fee", nullable = false)

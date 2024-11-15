@@ -57,7 +57,7 @@
 
   async function getData(period, year) {
     try {
-      const response = await fetch(`http://localhost:8080/api/appointment/stat?period=${period}&year=${year}`, {
+      const response = await fetch(`http://localhost:8081/api/appointment/stat?period=${period}&year=${year}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

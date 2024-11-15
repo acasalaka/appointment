@@ -253,7 +253,7 @@ public class AppointmentController {
         appointment.setTotalFee(doctor.getFee());
         appointment.setDiagnosis("");
         appointment.setStatus(0);
-        appointment.setTreatments(null);
+//        appointment.setTreatments(null);
         appointment.setPatient(patient);
 
         appointmentService.createAppointment(appointment);
@@ -286,7 +286,7 @@ public class AppointmentController {
 
         appointmentDTO.setId(appointment.getId());
         appointmentDTO.setDiagnosis(appointment.getDiagnosis());
-        appointmentDTO.setTreatments(appointment.getTreatments() != null ? appointment.getTreatments() : new ArrayList<>());
+//        appointmentDTO.setTreatments(appointment.getTreatments() != null ? appointment.getTreatments() : new ArrayList<>());
 
         model.addAttribute("appointment", appointment);
         model.addAttribute("appointmentDTO", appointmentDTO);
@@ -314,9 +314,9 @@ public class AppointmentController {
 
         appointment.setDiagnosis(appointmentDTO.getDiagnosis());
 
-        if (appointmentDTO.getTreatments() != null) {
-            appointment.setTreatments(appointmentDTO.getTreatments());
-        }
+//        if (appointmentDTO.getTreatments() != null) {
+//            appointment.setTreatments(appointmentDTO.getTreatments());
+//        }
 
         appointment.setUpdatedAt(new Date());
 

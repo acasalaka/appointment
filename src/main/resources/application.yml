@@ -1,8 +1,8 @@
 spring:
     application:
-        name: appointment2206829603
+        name: appointment50
     datasource:
-        url: jdbc:postgresql://localhost:15001/appointment2206829603
+        url: jdbc:postgresql://localhost:15001/appointment50
         username: postgres
         password: secret99
     jpa:

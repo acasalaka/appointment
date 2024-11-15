@@ -15,9 +15,10 @@ public class AppointmentResponseDTO {
     private String id;
     private String doctor;
     private String patient;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
     private Date date;
     private String diagnosis;
-    private List<String> treatments;
+//    private List<String> treatments;
     private Long totalFee;
     private int status;
 
@@ -26,8 +27,4 @@ public class AppointmentResponseDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
     private Date updatedAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
-    private Date deletedAt;
-
 }

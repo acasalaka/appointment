@@ -1,8 +1,8 @@
 ```toml
-name = 'ti-apap'
-id = '93686231-b65f-47ab-9c55-e9a63dd5bd7c'
+name = 'tk-appointment'
+id = '31440497-b312-44f8-b6a5-b7fccf9eb32a'
 
 [[environmentGroups]]
 name = 'Default'
-environments = ['ti-apap']
+environments = ['tk-appointment']
 ```
