@@ -10,6 +10,7 @@ import apap.ti.appointment2206829603.restservice.AppointmentRestService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -193,6 +194,25 @@ public class AppointmentRestController {
         baseResponseDTO.setStatus(HttpStatus.OK.value());
         baseResponseDTO.setData(listAppointment);
         baseResponseDTO.setMessage(String.format("List Appointment Berdasarkan ID Patient %s Berhasil Diambil", idPatient));
+        baseResponseDTO.setTimestamp(new Date());
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-date")
+    public ResponseEntity<BaseResponseDTO<List<AppointmentResponseDTO>>> listAppointmentByDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        List<AppointmentResponseDTO> listAppointment = appointmentRestService.getAllAppointmentsByDate(date);
+        var baseResponseDTO = new BaseResponseDTO<List<AppointmentResponseDTO>>();
+
+        if (listAppointment.isEmpty()) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(String.format("Appointment dengan tanggal %s belum tersedia", date));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setData(listAppointment);
+        baseResponseDTO.setMessage(String.format("List Appointment Berdasarkan Tanggal %s Berhasil Diambil", date));
         baseResponseDTO.setTimestamp(new Date());
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }

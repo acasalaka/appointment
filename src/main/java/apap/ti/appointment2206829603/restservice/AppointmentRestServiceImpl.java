@@ -294,4 +294,19 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
 
         return listAppointmentResponseDTO;
     }
+
+    @Override
+    public List<AppointmentResponseDTO> getAllAppointmentsByDate(Date date) {
+
+        Sort sortByName = Sort.by(Sort.Order.by("idDoctor"));
+        var listAppointment = appointmentDb.findAllByDateAndIsDeletedFalse(date);
+        System.out.println("total appointments: " + listAppointment.size());
+        var listAppointmentResponseDTO = new ArrayList<AppointmentResponseDTO>();
+        listAppointment.forEach(appointment -> {
+            var appointmentResponseDTO = appointmentToAppointmentResponseDTO(appointment);
+            listAppointmentResponseDTO.add(appointmentResponseDTO);
+        });
+
+        return listAppointmentResponseDTO;
+    }
 }

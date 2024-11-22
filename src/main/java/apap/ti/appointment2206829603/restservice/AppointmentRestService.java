@@ -7,8 +7,7 @@ import apap.ti.appointment2206829603.restdto.response.AppointmentResponseDTO;
 import apap.ti.appointment2206829603.restdto.response.AppointmentStatisticsResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public interface AppointmentRestService {
     AppointmentStatisticsResponseDTO getAppointmentStatistics(String period, Integer year);
@@ -20,5 +19,6 @@ public interface AppointmentRestService {
     AppointmentResponseDTO updateAppointmentStatus(UpdateAppointmentStatusRequestRestDTO appointmentDTO);
     List<AppointmentResponseDTO> getAllAppointmentsByIdDoctor(UUID DoctorID);
     List<AppointmentResponseDTO> getAllAppointmentsByIdPatient(UUID PatientID);
+    List<AppointmentResponseDTO> getAllAppointmentsByDate(Date date);
 
 }
