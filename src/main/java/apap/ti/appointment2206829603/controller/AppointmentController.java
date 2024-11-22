@@ -2,11 +2,8 @@ package apap.ti.appointment2206829603.controller;
 
 import apap.ti.appointment2206829603.DTO.request.AddAppointmentRequestDTO;
 import apap.ti.appointment2206829603.DTO.request.AddDiagnosisAndTreatmentRequestDTO;
-import apap.ti.appointment2206829603.DTO.request.AddPatientAndAppointmentRequestDTO;
 import apap.ti.appointment2206829603.DTO.request.UpdateAppointmentRequestDTO;
 import apap.ti.appointment2206829603.model.Appointment;
-import apap.ti.appointment2206829603.model.Doctor;
-import apap.ti.appointment2206829603.model.Patient;
 import apap.ti.appointment2206829603.model.Treatment;
 import apap.ti.appointment2206829603.service.AppointmentService;
 import apap.ti.appointment2206829603.service.DoctorService;
@@ -23,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -57,6 +55,7 @@ public class AppointmentController {
             List<Appointment> listAppointment = appointmentService.getAllAppointments();
             model.addAttribute("listAppointment", listAppointment);
             model.addAttribute("currentPage", "appointment");
+            model.addAttribute("appointmentService", appointmentService);
 
             return "viewall-appointment";
         } catch (Exception e) {
@@ -75,13 +74,14 @@ public class AppointmentController {
         var appointment = appointmentService.getAppointmentById(id);
 
         var appointmentDTO = new UpdateAppointmentRequestDTO();
-        Doctor doctor = doctorService.getDoctorById(appointment.getDoctor().getId());
+
+        var doctor = doctorService.getDoctorByIDFromRest(appointment.getIdDoctor());
 
         appointmentDTO.setId(id);
         appointmentDTO.setDoctorId(doctor.getId());
         appointmentDTO.setDate(appointment.getDate());
 
-        List<Doctor> doctors = doctorService.getAllDoctors();
+        var doctors = doctorService.getAllDoctorFromRest();
 
         model.addAttribute("listDoctor", doctors);
         model.addAttribute("currentPage", "appointment");
@@ -104,7 +104,7 @@ public class AppointmentController {
 
         var appointmentFromDTO = appointmentService.getAppointmentById(appointmentDTO.getId());
 
-        appointmentFromDTO.setDoctor(doctorService.getDoctorById(appointmentDTO.getDoctorId()));
+        appointmentFromDTO.setIdDoctor(appointmentDTO.getDoctorId());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date parsedDate = dateFormat.parse(dateFormat.format(appointmentDTO.getDate()));
         appointmentFromDTO.setDate(parsedDate);
@@ -154,12 +154,12 @@ public class AppointmentController {
 
     @GetMapping("/appointment/{nik}/create")
     public String createAppointmentForm(@PathVariable("nik") String nik, Model model) {
-        Patient patient = patientService.getPatientByNIK(nik);
+        var patient = patientService.getPatientByNIKFromRest(nik);
         var appointmentDTO = new AddAppointmentRequestDTO();
         model.addAttribute("patient", patient);
         model.addAttribute("name", patient.getName());
         model.addAttribute("appointmentDTO", appointmentDTO);
-        model.addAttribute("listDoctor", doctorService.getAllDoctors());
+        model.addAttribute("listDoctor", doctorService.getAllDoctorFromRest());
 
         return "form-add-appointment";
     }
@@ -182,88 +182,88 @@ public class AppointmentController {
 
         Appointment appointment = new Appointment();
 
-        Patient patient = patientService.getPatientByNIK(nik);
-        Doctor doctor = doctorService.getDoctorById(appointmentDTO.getDoctorId());
+        var patient = patientService.getPatientByNIKFromRest(nik);
+        var doctor = doctorService.getDoctorByIDFromRest(appointmentDTO.getDoctorId());
 
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
+        appointment.setIdPatient(patient.getId());
+        appointment.setIdDoctor(doctor.getId());
         appointment.setTotalFee(doctor.getFee());
         appointment.setDiagnosis("");
         appointment.setStatus(0);
         appointment.setDate(appointmentDTO.getDate());
-        appointment.setId(appointment.generateAppointmentId());
+        appointment.setId(appointmentService.generateAppointmentId(appointment));
 
         appointmentService.createAppointment(appointment);
 
         model.addAttribute("patient", patient);
         model.addAttribute("responseMessage",
-                String.format("Appointment %s for patient %s successfully added.", appointment.getId(), appointment.getPatient().getName()));
+                String.format("Appointment %s for patient with ID %s successfully added.", appointment.getId(), appointment.getIdPatient()));
 
         return "response-appointment";
     }
 
     @GetMapping("/appointment/available-dates")
     @ResponseBody
-    public List<String> getAvailableDates(@RequestParam("doctorId") String doctorId) {
-        Doctor doctor = doctorService.getDoctorById(doctorId);
-        List<Date> availableDates = appointmentService.getNextAvailableDates(doctor);
+    public List<String> getAvailableDates(@RequestParam("doctorId") UUID doctorId) {
+        var doctor = doctorService.getDoctorByIDFromRest(doctorId);
+        List<Date> availableDates = appointmentService.getNextAvailableDates(doctorId);
 
         return availableDates.stream()
                 .map(date -> new SimpleDateFormat("EEEE, dd MMMM yyyy").format(date))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/appointment/create-with-patient")
-    public String createAppointmentWithPatientForm(Model model) {
-        var appointmentDTO = new AddPatientAndAppointmentRequestDTO();
-        model.addAttribute("appointmentDTO", appointmentDTO);
-        model.addAttribute("listDoctor", doctorService.getAllDoctors());
-        model.addAttribute("currentPage", "appointment");
+//    @GetMapping("/appointment/create-with-patient")
+//    public String createAppointmentWithPatientForm(Model model) {
+//        var appointmentDTO = new AddPatientAndAppointmentRequestDTO();
+//        model.addAttribute("appointmentDTO", appointmentDTO);
+//        model.addAttribute("listDoctor", doctorService.getAllDoctorFromRest());
+//        model.addAttribute("currentPage", "appointment");
+//
+//        return "form-add-patient-appointment";
+//    }
 
-        return "form-add-patient-appointment";
-    }
-
-    @PostMapping("/appointment/create-with-patient")
-    public String addAppointmentAndPatient(@Valid @ModelAttribute AddPatientAndAppointmentRequestDTO appointmentDTO, BindingResult result, Model model) throws ParseException {
-        if (result.hasErrors()) {
-            model.addAttribute("title",  "Error updating Appointment");
-            model.addAttribute("errors", result.getAllErrors());
-            model.addAttribute("responseMessage", "New Patient Created. However, the new Appointment cannot be created. Please re-check the input.");
-            model.addAttribute("isError", true);
-            model.addAttribute("currentPage", "appointment");
-
-            return "response-appointment";
-        }
-        var patient = new Patient();
-        patient.setName(appointmentDTO.getPatient().getName());
-        patient.setNik(appointmentDTO.getPatient().getNik());
-        patient.setEmail(appointmentDTO.getPatient().getEmail());
-        patient.setGender(appointmentDTO.getPatient().isGender());
-        patient.setBirthDate(appointmentDTO.getPatient().getBirthDate());
-        patient.setBirthPlace(appointmentDTO.getPatient().getBirthPlace());
-
-        patientService.createPatient(patient);
-
-        Doctor doctor = doctorService.getDoctorById(appointmentDTO.getDoctorId());
-
-        var appointment = new Appointment();
-        appointment.setDate(appointmentDTO.getDate());
-        appointment.setDoctor(doctor);
-        appointment.setId(appointment.generateAppointmentId());
-        appointment.setTotalFee(doctor.getFee());
-        appointment.setDiagnosis("");
-        appointment.setStatus(0);
-//        appointment.setTreatments(null);
-        appointment.setPatient(patient);
-
-        appointmentService.createAppointment(appointment);
-
-        model.addAttribute("responseMessage",
-                String.format("Appointment %s for patient %s successfully added.", appointment.getId(), appointment.getPatient().getName()));
-
-        model.addAttribute("currentPage", "appointment");
-        return "response-appointment";
-    }
+//    @PostMapping("/appointment/create-with-patient")
+//    public String addAppointmentAndPatient(@Valid @ModelAttribute AddPatientAndAppointmentRequestDTO appointmentDTO, BindingResult result, Model model) throws ParseException {
+//        if (result.hasErrors()) {
+//            model.addAttribute("title",  "Error updating Appointment");
+//            model.addAttribute("errors", result.getAllErrors());
+//            model.addAttribute("responseMessage", "New Patient Created. However, the new Appointment cannot be created. Please re-check the input.");
+//            model.addAttribute("isError", true);
+//            model.addAttribute("currentPage", "appointment");
+//
+//            return "response-appointment";
+//        }
+//        var patient = new Patient();
+//        patient.setName(appointmentDTO.getPatient().getName());
+//        patient.setNik(appointmentDTO.getPatient().getNik());
+//        patient.setEmail(appointmentDTO.getPatient().getEmail());
+//        patient.setGender(appointmentDTO.getPatient().isGender());
+//        patient.setBirthDate(appointmentDTO.getPatient().getBirthDate());
+//        patient.setBirthPlace(appointmentDTO.getPatient().getBirthPlace());
+//
+//        patientService.createPatient(patient);
+//
+//        Doctor doctor = doctorService.getDoctorById(appointmentDTO.getDoctorId());
+//
+//        var appointment = new Appointment();
+//        appointment.setDate(appointmentDTO.getDate());
+//        appointment.setDoctor(doctor);
+//        appointment.setId(appointment.generateAppointmentId());
+//        appointment.setTotalFee(doctor.getFee());
+//        appointment.setDiagnosis("");
+//        appointment.setStatus(0);
+////        appointment.setTreatments(null);
+//        appointment.setPatient(patient);
+//
+//        appointmentService.createAppointment(appointment);
+//
+//        model.addAttribute("responseMessage",
+//                String.format("Appointment %s for patient %s successfully added.", appointment.getId(), appointment.getPatient().getName()));
+//
+//        model.addAttribute("currentPage", "appointment");
+//        return "response-appointment";
+//    }
 
     @GetMapping("/appointment/{id}")
     public String detailAppointment(@PathVariable("id") String id, Model model) {
@@ -278,9 +278,6 @@ public class AppointmentController {
     @GetMapping("/appointment/{id}/note")
     public String addDiagnosisAndTreatmentNote(@PathVariable("id") String id, Model model) {
         var appointment = appointmentService.getAppointmentById(id);
-        System.out.println(appointment);
-        System.out.println(appointment.getStatus());
-        System.out.println(appointment.statusString(appointment.getStatus()));
 
         AddDiagnosisAndTreatmentRequestDTO appointmentDTO = new AddDiagnosisAndTreatmentRequestDTO();
 

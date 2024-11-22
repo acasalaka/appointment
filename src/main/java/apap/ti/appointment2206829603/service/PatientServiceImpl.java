@@ -1,38 +1,49 @@
 package apap.ti.appointment2206829603.service;
 
-import apap.ti.appointment2206829603.model.Patient;
-import apap.ti.appointment2206829603.repository.PatientDb;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import apap.ti.appointment2206829603.restdto.response.BaseResponseDTO;
+import apap.ti.appointment2206829603.restdto.response.PatientResponseDTO;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
 @Service
 public class PatientServiceImpl implements PatientService {
-    @Autowired
-    PatientDb patientDb;
+    
+    private final WebClient webClient;
 
-    @Override
-    public Patient createPatient(Patient patient) {
-        return patientDb.save(patient);
+    public PatientServiceImpl(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8084").build();
     }
-    @Override
-    public List<Patient> getAllPatients() {
-        Sort sortByName = Sort.by(Sort.Order.by("name").ignoreCase());
-        return patientDb.findAll(sortByName);
-    };
 
     @Override
-    public Patient getPatientByNIK(String NIK) {
-        List<Patient> activePatients = getAllPatients();
+    public List<PatientResponseDTO> getAllPatientFromRest() {
+        var response = webClient.get().uri("/api/patient/viewall").retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<List<PatientResponseDTO>>>() {}).block();
 
-        for (Patient patient : activePatients) {
-            if (patient.getNik().equals(NIK)) {
-                return patient;
-            }
+        if (response == null) {
+            return null;
         }
 
-        return null;
+        if (response.getStatus() != 200) {
+            return null;
+        }
+
+        return response.getData();
+    }
+
+    @Override
+    public PatientResponseDTO getPatientByNIKFromRest(String nik) {
+        var response = webClient.get().uri("/api/patient/" + nik).retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<PatientResponseDTO>>() {}).block();
+
+        if (response == null) {
+            return null;
+        }
+
+        if (response.getStatus() != 200) {
+            return null;
+        }
+
+        return response.getData();
     }
 }

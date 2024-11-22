@@ -37,10 +37,10 @@
     <tr th:each="appointment, i : ${listAppointment}">
       <td th:text="${i.index + 1}"></td>
       <td th:text="${appointment.id}"></td>
-      <td th:text="${appointment.doctor.name}"></td>
-      <td th:text="${appointment.patient.name}"></td>
+      <td th:text="${appointment.IdDoctor}"></td>
+      <td th:text="${appointment.IdPatient}"></td>
       <td th:text="${#dates.format(appointment.date, 'dd MMMM yyyy')}"></td>
-      <td th:text="${appointment.statusString(appointment.status)}"></td>
+      <td th:text="${appointmentService.statusString(appointment.status)}"></td>
       <td>
         <div class="text-center">
           <a type="button" class="btn btn-md btn-primary"

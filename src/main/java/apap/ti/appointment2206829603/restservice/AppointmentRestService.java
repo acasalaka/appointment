@@ -8,6 +8,7 @@ import apap.ti.appointment2206829603.restdto.response.AppointmentStatisticsRespo
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AppointmentRestService {
     AppointmentStatisticsResponseDTO getAppointmentStatistics(String period, Integer year);
@@ -17,4 +18,7 @@ public interface AppointmentRestService {
     AppointmentResponseDTO appointmentToAppointmentResponseDTO(Appointment appointment);
     Appointment deleteAppointment(String id) throws EntityNotFoundException;
     AppointmentResponseDTO updateAppointmentStatus(UpdateAppointmentStatusRequestRestDTO appointmentDTO);
+    List<AppointmentResponseDTO> getAllAppointmentsByIdDoctor(UUID DoctorID);
+    List<AppointmentResponseDTO> getAllAppointmentsByIdPatient(UUID PatientID);
+
 }

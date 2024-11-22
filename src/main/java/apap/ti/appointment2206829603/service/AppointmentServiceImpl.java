@@ -1,21 +1,22 @@
 package apap.ti.appointment2206829603.service;
 
 import apap.ti.appointment2206829603.model.Appointment;
-import apap.ti.appointment2206829603.model.Doctor;
 import apap.ti.appointment2206829603.repository.AppointmentDb;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentDb appointmentDb;
+
+    @Autowired
+    DoctorService doctorService;
 
     public AppointmentServiceImpl(AppointmentDb appointmentDb) {
         this.appointmentDb = appointmentDb;
@@ -51,7 +52,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentDb.save(appointment);
     }
 
-    public List<Date> getNextAvailableDates(Doctor doctor) {
+    @Override
+    public List<Date> getNextAvailableDates(UUID doctorId) {
         List<Date> availableDates = new ArrayList<>();
         Calendar current = Calendar.getInstance();
 
@@ -63,18 +65,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         int dayLimit = 28;
         int addedDays = 0;
 
+        var doctor = doctorService.getDoctorByIDFromRest(doctorId);
+
         while (addedDays < dayLimit) {
             int currentDayOfWeek = current.get(Calendar.DAY_OF_WEEK);
 
             if (doctor.getSchedules().contains(currentDayOfWeek)) {
-
-                boolean hasAppointment = doctor.getAppointments().stream()
-                        .anyMatch(app -> app.getDate().equals(current.getTime()));
-
-                if (!hasAppointment) {
-                    availableDates.add(current.getTime());
-                    addedDays++;
-                }
+                availableDates.add(current.getTime());
+                addedDays++;
             }
 
             current.add(Calendar.DAY_OF_MONTH, 1);
@@ -84,14 +82,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
 
-
+    @Override
     public Appointment updateAppointment(Appointment appointment) {
         Appointment getAppointment = getAppointmentById(appointment.getId());
         if (getAppointment != null) {
-            getAppointment.setDoctor(appointment.getDoctor());
+            getAppointment.setIdDoctor(appointment.getIdDoctor());
             getAppointment.setDate(appointment.getDate());
             getAppointment.setUpdatedAt(new Date());
-            getAppointment.setTotalFee(appointment.getDoctor().getFee());
+            getAppointment.setTotalFee(doctorService.getDoctorByIDFromRest(appointment.getIdDoctor()).getFee());
             appointmentDb.save(getAppointment);
         }
         return getAppointment;
@@ -130,5 +128,39 @@ public class AppointmentServiceImpl implements AppointmentService {
         return allAppointments.stream()
                 .filter(appointment -> !appointment.getDate().before(startDate) && !appointment.getDate().after(endDate))
                 .collect(Collectors.toList());
+    }
+
+    public String generateAppointmentId(Appointment appointment) {
+        if (appointment.getDate() == null) {
+            throw new IllegalArgumentException("Appointment date cannot be null");
+        }
+
+        var doctor = doctorService.getDoctorByIDFromRest(appointment.getIdDoctor());
+
+        String specializationCode = doctor.getSpecialist();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMM");
+        String dateCode = formatter.format(appointment.getDate());
+
+        int sequenceNumber = getAppointmentSequenceForDoctor(appointment.getIdDoctor(), appointment.getDate());
+
+        String sequenceCode = String.format("%03d", sequenceNumber);
+
+        return specializationCode + dateCode + sequenceCode;
+    }
+
+    private int getAppointmentSequenceForDoctor(UUID idDoctor, Date appointmentDate) {
+        List<Appointment> existingAppointments = appointmentDb.findAllByIdDoctorAndDateAndIsDeletedFalse(idDoctor, appointmentDate);
+
+        return existingAppointments.size() + 1;
+    }
+
+    public String statusString(int status) {
+        return switch (status) {
+            case 0 -> "Created";
+            case 1 -> "Done";
+            case 2 -> "Cancelled";
+            default -> "Invalid Status";
+        };
     }
 }

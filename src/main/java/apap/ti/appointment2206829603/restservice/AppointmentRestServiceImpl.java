@@ -1,15 +1,14 @@
 package apap.ti.appointment2206829603.restservice;
 
 import apap.ti.appointment2206829603.model.Appointment;
-import apap.ti.appointment2206829603.model.Doctor;
-import apap.ti.appointment2206829603.model.Patient;
 import apap.ti.appointment2206829603.repository.AppointmentDb;
-import apap.ti.appointment2206829603.repository.DoctorDb;
-import apap.ti.appointment2206829603.repository.PatientDb;
 import apap.ti.appointment2206829603.restdto.request.AddAppointmentRequestRestDTO;
 import apap.ti.appointment2206829603.restdto.request.UpdateAppointmentStatusRequestRestDTO;
 import apap.ti.appointment2206829603.restdto.response.AppointmentResponseDTO;
 import apap.ti.appointment2206829603.restdto.response.AppointmentStatisticsResponseDTO;
+import apap.ti.appointment2206829603.service.AppointmentService;
+import apap.ti.appointment2206829603.service.DoctorService;
+import apap.ti.appointment2206829603.service.PatientService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +25,13 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
     AppointmentDb appointmentDb;
 
     @Autowired
-    DoctorDb doctorDb;
+    AppointmentService appointmentService;
 
     @Autowired
-    PatientDb patientDb;
+    DoctorService doctorService;
+
+    @Autowired
+    PatientService patientService;
 
     @Override
     public AppointmentStatisticsResponseDTO getAppointmentStatistics(String period, Integer year) {
@@ -166,7 +168,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
     @Override
     public List<AppointmentResponseDTO> getAllAppointments() {
 
-        Sort sortByName = Sort.by(Sort.Order.by("doctor.name").ignoreCase());
+        Sort sortByName = Sort.by(Sort.Order.by("idDoctor"));
         var listAppointment = appointmentDb.findAllByIsDeletedFalse(sortByName);
         System.out.println("total appointments: " + listAppointment.size());
         var listAppointmentResponseDTO = new ArrayList<AppointmentResponseDTO>();
@@ -193,19 +195,19 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         Appointment newAppointment = new Appointment();
         newAppointment.setDate(appointmentDTO.getDate());
 
-        Doctor doctor = doctorDb.findById(appointmentDTO.getDoctorId()).orElse(null);
-        newAppointment.setDoctor(doctor);
+        newAppointment.setIdDoctor(appointmentDTO.getDoctorId());
+        var patient = patientService.getPatientByNIKFromRest(appointmentDTO.getNik());
 
-        Patient patient = patientDb.findByNik(appointmentDTO.getNik());
-        newAppointment.setPatient(patient);
+        newAppointment.setIdPatient(patient.getId());
 
-        newAppointment.setId(newAppointment.generateAppointmentId());
         newAppointment.setStatus(0);
         newAppointment.setDiagnosis("");
+        var doctor = doctorService.getDoctorByIDFromRest(appointmentDTO.getDoctorId());
         newAppointment.setTotalFee(doctor.getFee());
         newAppointment.setCreatedAt(new Date());
         newAppointment.setUpdatedAt(new Date());
         newAppointment.setDeleted(false);
+        newAppointment.setId(appointmentService.generateAppointmentId(newAppointment));
 
         appointmentDb.save(newAppointment);
 
@@ -216,8 +218,8 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
     public AppointmentResponseDTO appointmentToAppointmentResponseDTO(Appointment appointment) {
         AppointmentResponseDTO responseDTO = new AppointmentResponseDTO();
         responseDTO.setId(appointment.getId());
-        responseDTO.setDoctor(appointment.getDoctor().getName());
-        responseDTO.setPatient(appointment.getPatient().getName());
+        responseDTO.setDoctorId(appointment.getIdDoctor());
+        responseDTO.setPatientId(appointment.getIdPatient());
         responseDTO.setDate(appointment.getDate());
         responseDTO.setDiagnosis(appointment.getDiagnosis());
         responseDTO.setTotalFee(appointment.getTotalFee());
@@ -240,7 +242,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         if (appointment == null) {
             throw new EntityNotFoundException("Data appointment tidak ditemukan");
         }
-        appointmentDb.save(appointment);
+        appointmentService.deleteAppointment(appointment);
         return appointment;
     }
 
@@ -252,14 +254,44 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
             }
 
             appointment.setId(appointmentDTO.getId());
-            var patient = patientDb.findByNik(appointmentDTO.getNik());
-            appointment.setPatient(patient);
-            var doctor = doctorDb.findById(appointmentDTO.getDoctorId()).orElse(null);
-            appointment.setDoctor(doctor);
+            var patient = patientService.getPatientByNIKFromRest(appointmentDTO.getNik());
+            appointment.setIdPatient(patient.getId());
+            var doctor = doctorService.getDoctorByIDFromRest(appointmentDTO.getDoctorId());
+            appointment.setIdDoctor(doctor.getId());
             appointment.setDate(appointmentDTO.getDate());
             appointment.setStatus(appointmentDTO.getStatus());
 
             var updateAppointment = appointmentDb.save(appointment);
             return appointmentToAppointmentResponseDTO(updateAppointment);
         }
+
+    @Override
+    public List<AppointmentResponseDTO> getAllAppointmentsByIdDoctor(UUID IdDoctor) {
+
+        Sort sortByName = Sort.by(Sort.Order.by("idDoctor"));
+        var listAppointment = appointmentDb.findAllByIdDoctorAndIsDeletedFalse(IdDoctor);
+        System.out.println("total appointments: " + listAppointment.size());
+        var listAppointmentResponseDTO = new ArrayList<AppointmentResponseDTO>();
+        listAppointment.forEach(appointment -> {
+            var appointmentResponseDTO = appointmentToAppointmentResponseDTO(appointment);
+            listAppointmentResponseDTO.add(appointmentResponseDTO);
+        });
+
+        return listAppointmentResponseDTO;
     }
+
+    @Override
+    public List<AppointmentResponseDTO> getAllAppointmentsByIdPatient(UUID IdPatient) {
+
+        Sort sortByName = Sort.by(Sort.Order.by("idDoctor"));
+        var listAppointment = appointmentDb.findAllByIdPatientAndIsDeletedFalse(IdPatient);
+        System.out.println("total appointments: " + listAppointment.size());
+        var listAppointmentResponseDTO = new ArrayList<AppointmentResponseDTO>();
+        listAppointment.forEach(appointment -> {
+            var appointmentResponseDTO = appointmentToAppointmentResponseDTO(appointment);
+            listAppointmentResponseDTO.add(appointmentResponseDTO);
+        });
+
+        return listAppointmentResponseDTO;
+    }
+}

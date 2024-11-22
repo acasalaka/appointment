@@ -1,67 +1,50 @@
 package apap.ti.appointment2206829603.service;
 
-import apap.ti.appointment2206829603.model.Doctor;
-import apap.ti.appointment2206829603.repository.DoctorDb;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import apap.ti.appointment2206829603.restdto.response.BaseResponseDTO;
+import apap.ti.appointment2206829603.restdto.response.DoctorResponseDTO;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
-    @Autowired
-    DoctorDb doctorDb;
+    private final WebClient webClient;
 
-    @Override
-    public Doctor addDoctor(Doctor doctor) {
-        return doctorDb.save(doctor);
+    public DoctorServiceImpl(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8084").build();
     }
 
     @Override
-    public List<Doctor> getAllDoctors() {
-        Sort sortByName = Sort.by(Sort.Order.by("name").ignoreCase());
-        return doctorDb.findAllByDeletedAtIsNull(sortByName);
-    };
+    public List<DoctorResponseDTO> getAllDoctorFromRest() {
+        var response = webClient.get().uri("/api/doctor/viewall").retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<List<DoctorResponseDTO>>>() {}).block();
 
-    @Override
-    public Doctor getDoctorById(String idDoctor) {
-        List<Doctor> activeDoctors = getAllDoctors();
-
-        for (Doctor doctor : activeDoctors) {
-            if (doctor.getId().equals(idDoctor)) {
-                return doctor;
-            }
+        if (response == null) {
+            return null;
         }
 
-        return null;
-    }
-
-    @Override
-    public Doctor updateDoctor(Doctor doctor) {
-        Doctor getDoctor = getDoctorById(doctor.getId());
-        if (getDoctor != null) {
-            String name = getDoctor.sanitizeName(doctor.getName());
-            getDoctor.setName(name);
-            getDoctor.setSpecialist(doctor.getSpecialist());
-            getDoctor.setEmail(doctor.getEmail());
-            getDoctor.setGender(doctor.isGender());
-            getDoctor.setYearsOfExperience(doctor.getYearsOfExperience());
-            getDoctor.setSchedules(doctor.getSchedules());
-            getDoctor.setFee(doctor.getFee());
-            doctorDb.save(getDoctor);
-
-            return getDoctor;
+        if (response.getStatus() != 200) {
+            return null;
         }
 
-        return null;
+        return response.getData();
     }
 
     @Override
-    public void deleteDoctor(Doctor doctor) {
-        doctor.setDeletedAt(new Date());
-        doctorDb.save(doctor);
+    public DoctorResponseDTO getDoctorByIDFromRest(UUID id) {
+        var response = webClient.get().uri("/api/doctor/" + id).retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<DoctorResponseDTO>>() {}).block();
+
+        if (response == null) {
+            return null;
+        }
+
+        if (response.getStatus() != 200) {
+            return null;
+        }
+
+        return response.getData();
     }
 }

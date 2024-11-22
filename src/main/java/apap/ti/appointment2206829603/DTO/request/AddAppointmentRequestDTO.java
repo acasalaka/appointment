@@ -1,6 +1,7 @@
 package apap.ti.appointment2206829603.DTO.request;
 
 import java.util.Date;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,7 +18,7 @@ public class AddAppointmentRequestDTO {
     private String nik;
 
     @NotNull(message = "Doctor ID column must be filled!")
-    private String doctorId;
+    private UUID doctorId;
 
     @NotNull(message = "Date column must be filled.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

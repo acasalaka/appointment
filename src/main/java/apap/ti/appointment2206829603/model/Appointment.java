@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -24,13 +25,13 @@ public class Appointment {
     @Column(name = "id", length = 10)
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_doctor", referencedColumnName = "id", nullable = false)
-    private Doctor doctor;
+    @NotNull
+    @Column(name = "id_doctor")
+    private UUID idDoctor;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_patient", referencedColumnName = "id", nullable = false)
-    private Patient patient;
+    @NotNull
+    @Column(name = "id_patient")
+    private UUID idPatient;
 
     @NotNull
     @Column(name = "date", columnDefinition = "DATE", nullable = false)
@@ -69,37 +70,4 @@ public class Appointment {
     @NotNull
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
-
-    public String generateAppointmentId() {
-        if (this.date == null) {
-            throw new IllegalArgumentException("Appointment date cannot be null");
-        }
-
-        Doctor doctor = this.doctor;
-
-        String specializationCode = doctor.getSpecializationCode(doctor.getSpecialist());
-
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMM");
-        String dateCode = formatter.format(this.date);
-
-        int sequenceNumber = 1;
-        for (Appointment appointment : doctor.getAppointments()) {
-            if (appointment.getDate().equals(this.date)) {
-                sequenceNumber++;
-            }
-        }
-
-        String sequenceCode = String.format("%03d", sequenceNumber);
-
-        return specializationCode + dateCode + sequenceCode;
-    }
-
-    public String statusString(int status) {
-        return switch (status) {
-            case 0 -> "Created";
-            case 1 -> "Done";
-            case 2 -> "Cancelled";
-            default -> "Invalid Status";
-        };
-    }
 }

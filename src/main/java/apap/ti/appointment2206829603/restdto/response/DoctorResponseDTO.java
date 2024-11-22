@@ -1,39 +1,35 @@
 package apap.ti.appointment2206829603.restdto.response;
 
-import java.time.LocalDate;
-
-import apap.ti.appointment2206829603.model.Appointment;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 
 public class DoctorResponseDTO {
-    private String id;
+    private UUID id;
     private String name;
-    private int specialist;
+    private String username;
+    private String password;
     private String email;
-    private boolean gender;
+    private String gender;
+    private String specialist;
     private int yearsOfExperience;
-    private List<Integer> schedules;
     private Long fee;
-    private List<Appointment> appointments;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
+    private List<Integer> schedules;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Jakarta")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date updatedAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
-    private Date deletedAt;
+    private boolean isDeleted;
 }

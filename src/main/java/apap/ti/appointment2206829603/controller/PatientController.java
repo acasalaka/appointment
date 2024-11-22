@@ -1,8 +1,5 @@
 package apap.ti.appointment2206829603.controller;
 
-import apap.ti.appointment2206829603.DTO.request.AddDoctorRequestDTO;
-import apap.ti.appointment2206829603.DTO.request.SearchPatientRequestDTO;
-import apap.ti.appointment2206829603.model.Patient;
 import apap.ti.appointment2206829603.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +20,7 @@ public class PatientController {
 
     @GetMapping("/patient/search/{nik}")
     private String searchPatient(@PathVariable("nik") String nik, Model model) {
-        Patient patient = patientService.getPatientByNIK(nik);
+        var patient = patientService.getPatientByNIKFromRest(nik);
 
         if (patient == null) {
             model.addAttribute("nik", nik);

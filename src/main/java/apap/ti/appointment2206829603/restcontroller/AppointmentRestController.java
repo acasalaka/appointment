@@ -27,7 +27,7 @@ public class AppointmentRestController {
     AppointmentRestService appointmentRestService;
 
     @GetMapping("/viewall")
-        public ResponseEntity<BaseResponseDTO<List<AppointmentResponseDTO>>> listAppointment() {
+    public ResponseEntity<BaseResponseDTO<List<AppointmentResponseDTO>>> listAppointment() {
         List<AppointmentResponseDTO> listAppointment = appointmentRestService.getAllAppointments();
 
         var baseResponseDTO = new BaseResponseDTO<List<AppointmentResponseDTO>>();
@@ -159,4 +159,41 @@ public class AppointmentRestController {
         return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/by-doctor")
+    public ResponseEntity<BaseResponseDTO<List<AppointmentResponseDTO>>> listAppointmentByDoctorId(@RequestParam("idDoctor") UUID idDoctor) {
+        List<AppointmentResponseDTO> listAppointment = appointmentRestService.getAllAppointmentsByIdDoctor(idDoctor);
+        var baseResponseDTO = new BaseResponseDTO<List<AppointmentResponseDTO>>();
+
+        if (listAppointment.isEmpty()) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(String.format("Doctor dengan ID %s belum memiliki appointment", idDoctor));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setData(listAppointment);
+        baseResponseDTO.setMessage(String.format("List Appointment Berdasarkan ID Doctor %s Berhasil Diambil", idDoctor));
+        baseResponseDTO.setTimestamp(new Date());
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-patient")
+    public ResponseEntity<BaseResponseDTO<List<AppointmentResponseDTO>>> listAppointmentByPatientId(@RequestParam("idPatient") UUID idPatient) {
+        List<AppointmentResponseDTO> listAppointment = appointmentRestService.getAllAppointmentsByIdPatient(idPatient);
+        var baseResponseDTO = new BaseResponseDTO<List<AppointmentResponseDTO>>();
+
+        if (listAppointment.isEmpty()) {
+            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+            baseResponseDTO.setMessage(String.format("Patient dengan ID %s belum memiliki appointment", idPatient));
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        baseResponseDTO.setStatus(HttpStatus.OK.value());
+        baseResponseDTO.setData(listAppointment);
+        baseResponseDTO.setMessage(String.format("List Appointment Berdasarkan ID Patient %s Berhasil Diambil", idPatient));
+        baseResponseDTO.setTimestamp(new Date());
+        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+    }
 }
