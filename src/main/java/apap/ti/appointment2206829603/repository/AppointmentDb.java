@@ -16,6 +16,7 @@ public interface AppointmentDb extends JpaRepository<Appointment, String> {
     Optional<Appointment> findByIdAndIsDeletedFalse(String appointmentId);
     List<Appointment> findAllByIdDoctorAndIsDeletedFalse(UUID idDoctor);
     List<Appointment> findAllByIdPatientAndIsDeletedFalse(UUID idPatient);
-    List<Appointment> findAllByDateAndIsDeletedFalse(Date date);
+    List<Appointment> findAllByDateBetweenAndIsDeletedFalse(Date startDate, Date endDate, Sort sort);
     List<Appointment> findAllByIdDoctorAndDateAndIsDeletedFalse(UUID idDoctor, Date appointmentDate);
+    boolean existsByIdDoctorAndDate(UUID idDoctor, Date date);
 }

@@ -32,16 +32,16 @@ public class Treatment {
     private Long price;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idAppointment", referencedColumnName = "id")
+    @JoinColumn(name = "id_appointment", referencedColumnName = "id")
     private Appointment appointments;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createdAt", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private Date updatedAt;
 }

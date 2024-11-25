@@ -21,7 +21,7 @@ public class AppointmentResponseDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
     private String diagnosis;
-//    private List<String> treatments;
+    private List<Long> treatments;
     private Long totalFee;
     private int status;
 
