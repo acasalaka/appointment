@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UpdateAppointmentDiagnosisAndTreatmentRequestRestDTO extends AddAppointmentRequestRestDTO {
+public class UpdateAppointmentDiagnosisAndTreatmentRequestRestDTO {
     private String id;
     private String diagnosis;
     private List<Long> treatments;

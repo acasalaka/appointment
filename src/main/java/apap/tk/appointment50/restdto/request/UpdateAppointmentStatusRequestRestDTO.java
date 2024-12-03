@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UpdateAppointmentStatusRequestRestDTO extends AddAppointmentRequestRestDTO {
+public class UpdateAppointmentStatusRequestRestDTO {
     private String id;
     private int status;
 }

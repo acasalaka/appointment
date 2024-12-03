@@ -16,7 +16,6 @@ public class TreatmentResponseDTO {
     private Long id;
     private String name;
     private Long price;
-    private Appointment appointments;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

@@ -109,11 +109,6 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
             }
 
             appointment.setId(appointmentDTO.getId());
-            var patient = patientService.getPatientByNIKFromRest(appointmentDTO.getNik());
-            appointment.setIdPatient(patient.getId());
-            var doctor = doctorService.getDoctorByIDFromRest(appointmentDTO.getDoctorId());
-            appointment.setIdDoctor(doctor.getId());
-            appointment.setDate(appointmentDTO.getDate());
             appointment.setStatus(appointmentDTO.getStatus());
 
             var updateAppointment = appointmentDb.save(appointment);
@@ -128,11 +123,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         }
 
         appointment.setId(appointmentDTO.getId());
-        var patient = patientService.getPatientByNIKFromRest(appointmentDTO.getNik());
-        appointment.setIdPatient(patient.getId());
-        var doctor = doctorService.getDoctorByIDFromRest(appointmentDTO.getDoctorId());
-        appointment.setIdDoctor(doctor.getId());
-        appointment.setDate(appointmentDTO.getDate());
+        var doctor = doctorService.getDoctorByIDFromRest(appointment.getIdDoctor());
         appointment.setDiagnosis(appointmentDTO.getDiagnosis());
 
         long totalFee = doctor.getFee();
@@ -140,7 +131,6 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         List<Treatment> treatments = new ArrayList<>();
         for (Long treatmentId : treatmentIds) {
             Treatment treatment = treatmentService.getTreatmentById(treatmentId);
-            System.out.println("Treatment ID: " + treatmentId + ", Treatment: " + treatment + ", Price: " + (treatment != null ? treatment.getPrice() : "N/A"));
             if (treatment != null) {
                 treatments.add(treatment);
                 totalFee += treatment.getPrice();
