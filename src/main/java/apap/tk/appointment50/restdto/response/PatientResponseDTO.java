@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class PatientResponseDTO {
-    private UUID id = UUID.randomUUID();
+    private UUID id;
     private String name;
     private String username;
     private String password;

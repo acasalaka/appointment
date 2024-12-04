@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,9 +32,11 @@ public class Treatment {
     @Column(name = "price", nullable = false)
     private Long price;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_appointment", referencedColumnName = "id")
-    private Appointment appointments;
+    @ManyToMany(mappedBy = "treatments", fetch = FetchType.LAZY)
+//    @JoinColumn(name = "id_appointment", referencedColumnName = "id")
+//    @JoinTable(name = "treatment_on_appointment", joinColumns = @JoinColumn(name = "id_appointment"),
+//            inverseJoinColumns = @JoinColumn(name = "id_treatment"))
+    private List<Appointment> appointments;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

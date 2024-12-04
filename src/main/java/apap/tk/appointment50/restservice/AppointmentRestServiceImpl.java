@@ -7,10 +7,7 @@ import apap.tk.appointment50.restdto.request.AddAppointmentRequestRestDTO;
 import apap.tk.appointment50.restdto.request.UpdateAppointmentDiagnosisAndTreatmentRequestRestDTO;
 import apap.tk.appointment50.restdto.request.UpdateAppointmentStatusRequestRestDTO;
 import apap.tk.appointment50.restdto.response.AppointmentResponseDTO;
-import apap.tk.appointment50.service.AppointmentService;
-import apap.tk.appointment50.service.DoctorService;
-import apap.tk.appointment50.service.PatientService;
-import apap.tk.appointment50.service.TreatmentService;
+import apap.tk.appointment50.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,9 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
 
     @Autowired
     TreatmentService treatmentService;
+
+    @Autowired
+    BillService billService;
 
     @Override
     public List<AppointmentResponseDTO> getAllAppointments() {
@@ -85,6 +85,12 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         newAppointment.setId(appointmentService.generateAppointmentId(newAppointment));
 
         appointmentDb.save(newAppointment);
+        try {
+            billService.createBillByAppointmentID(newAppointment.getId(), newAppointment.getIdPatient());
+            System.out.println("create bill with appointment id " + newAppointment.getId() + "with patient ID " + newAppointment.getIdPatient());
+        } catch (Exception e) {
+            System.err.println("Failed to create bill: " + e.getMessage());
+        }
 
         return appointmentToAppointmentResponseDTO(newAppointment);
     }

@@ -50,7 +50,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientResponseDTO getPatientByIDFromRest(UUID id) {
-        var response = webClient.get().uri("/api/patient/get-id/" + id).retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<PatientResponseDTO>>() {}).block();
+        var response = webClient.get().uri("/api/patient/detail/" + id).retrieve().bodyToMono(new ParameterizedTypeReference<BaseResponseDTO<PatientResponseDTO>>() {}).block();
 
         if (response == null) {
             return null;
