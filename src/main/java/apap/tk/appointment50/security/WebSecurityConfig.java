@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                         .requestMatchers("api/appointment/add").hasAnyAuthority("ADMIN", "PATIENT")
                         .requestMatchers("api/appointment/update-status").hasAnyAuthority("ADMIN", "PATIENT")
                         .requestMatchers("api/appointment/update-treatments").hasAuthority("DOCTOR")
-                        .requestMatchers("api/appointment/**/delete").hasAuthority("ADMIN")
+                        .requestMatchers("api/appointment/*/delete").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

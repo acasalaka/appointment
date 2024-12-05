@@ -1,17 +1,17 @@
 package apap.tk.appointment50.restdto.response;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BillResponseDTO {
-    private String status;
+    private BillStatus status;
     private UUID id;
     private String appointmentId;
     private Long appointmentFee;

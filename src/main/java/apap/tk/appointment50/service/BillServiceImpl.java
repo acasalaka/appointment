@@ -17,17 +17,12 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillResponseDTO createBillByAppointmentID(String appointmentId, UUID patientId){
-        AddBillRequestDTO billRequest = new AddBillRequestDTO();
-        billRequest.setAppointmentId(appointmentId);
-        billRequest.setPatientId(patientId);
-        billRequest.setId(UUID.randomUUID());
-
-        System.out.println("Sending request to Bill API with: " + billRequest);
+    public BillResponseDTO createBillByAppointmentID(BillResponseDTO billDTO){
+        System.out.println("Sending request to Bill API with: " + billDTO);
 
         return webClient.post()
                 .uri("/api/bill/createByAppointment")
-                .bodyValue(billRequest)
+                .bodyValue(billDTO)
                 .retrieve()
                 .bodyToMono(BillResponseDTO.class)
                 .doOnNext(response -> System.out.println("Received response: " + response))

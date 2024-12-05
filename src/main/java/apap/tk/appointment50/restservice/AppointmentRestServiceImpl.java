@@ -7,9 +7,11 @@ import apap.tk.appointment50.restdto.request.AddAppointmentRequestRestDTO;
 import apap.tk.appointment50.restdto.request.UpdateAppointmentDiagnosisAndTreatmentRequestRestDTO;
 import apap.tk.appointment50.restdto.request.UpdateAppointmentStatusRequestRestDTO;
 import apap.tk.appointment50.restdto.response.AppointmentResponseDTO;
+import apap.tk.appointment50.restdto.response.BillResponseDTO;
 import apap.tk.appointment50.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @Transactional
 public class AppointmentRestServiceImpl implements AppointmentRestService {
@@ -90,13 +93,17 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         newAppointment.setUpdatedBy(username);
         newAppointment.setId(appointmentService.generateAppointmentId(newAppointment));
 
-        appointmentDb.save(newAppointment);
+        BillResponseDTO billDTO = new BillResponseDTO();
+        billDTO.setAppointmentId(newAppointment.getId());
+        billDTO.setPatientId(newAppointment.getIdPatient());
+
         try {
-            billService.createBillByAppointmentID(newAppointment.getId(), newAppointment.getIdPatient());
+            billService.createBillByAppointmentID(billDTO);
             System.out.println("create bill with appointment id " + newAppointment.getId() + "with patient ID " + newAppointment.getIdPatient());
         } catch (Exception e) {
             System.err.println("Failed to create bill: " + e.getMessage());
         }
+        appointmentDb.save(newAppointment);
 
         return appointmentToAppointmentResponseDTO(newAppointment);
     }
@@ -123,6 +130,8 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
             appointment.setId(appointmentDTO.getId());
             appointment.setStatus(appointmentDTO.getStatus());
             appointment.setUpdatedBy(appointmentDTO.getUpdatedBy());
+
+            log.info("UPDATED BY " + appointmentDTO.getUpdatedBy());
 
             var updateAppointment = appointmentDb.save(appointment);
             return appointmentToAppointmentResponseDTO(updateAppointment);
@@ -224,7 +233,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         responseDTO.setCreatedBy(username);
-        responseDTO.setUpdatedBy(username);
+        responseDTO.setUpdatedBy(appointment.getUpdatedBy());
 
         return responseDTO;
     }

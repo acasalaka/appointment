@@ -2,6 +2,7 @@ package apap.tk.appointment50.service;
 
 import apap.tk.appointment50.model.Appointment;
 import apap.tk.appointment50.repository.AppointmentDb;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
@@ -89,6 +91,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             getAppointment.setIdDoctor(appointment.getIdDoctor());
             getAppointment.setDate(appointment.getDate());
             getAppointment.setUpdatedAt(new Date());
+            log.info("UPDATED BY " + appointment.getUpdatedBy());
+            getAppointment.setUpdatedBy(appointment.getUpdatedBy());
             getAppointment.setTotalFee(doctorService.getDoctorByIDFromRest(appointment.getIdDoctor()).getFee());
             appointmentDb.save(getAppointment);
         }

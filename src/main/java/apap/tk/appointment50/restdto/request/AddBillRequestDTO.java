@@ -1,17 +1,17 @@
 package apap.tk.appointment50.restdto.request;
 
+import java.util.UUID;
+
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class AddBillRequestDTO {
-    private UUID id;
+//    private UUID id;
 
     @Nullable
     private String policyId;

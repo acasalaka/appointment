@@ -50,19 +50,30 @@ public class AppointmentRestController {
 
         AppointmentResponseDTO appointment = appointmentRestService.getAppointmentById(id);
 
-        if (appointment == null) {
-            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
-            baseResponseDTO.setMessage("Data appointment tidak ditemukan");
+        try {
+            if (appointment == null) {
+                baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+                baseResponseDTO.setMessage("Data appointment tidak ditemukan");
+                baseResponseDTO.setTimestamp(new Date());
+                return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+            }
+            baseResponseDTO.setStatus(HttpStatus.OK.value());
+            baseResponseDTO.setData(appointment);
+            baseResponseDTO.setMessage(String.format("Appointment dengan ID %s berhasil ditemukan", appointment.getId()));
             baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
+        } catch (SecurityException e) {
+            baseResponseDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
+            baseResponseDTO.setMessage("Unauthorized: You do not have permission to delete this appointment.");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Internal Server Error: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        baseResponseDTO.setStatus(HttpStatus.OK.value());
-        baseResponseDTO.setData(appointment);
-        baseResponseDTO.setMessage(String.format("Appointment dengan ID %s berhasil ditemukan", appointment.getId()));
-        baseResponseDTO.setTimestamp(new Date());
-
-        return new ResponseEntity<>(baseResponseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/add")
@@ -83,33 +94,49 @@ public class AppointmentRestController {
 
         var baseResponseDTO = new BaseResponseDTO<AppointmentResponseDTO>();
 
-        if (bindingResult.hasFieldErrors()) {
-            String errorMessages = "";
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessages += error.getDefaultMessage() + "; ";
+        try {
+            if (bindingResult.hasFieldErrors()) {
+                String errorMessages = "";
+                List<FieldError> errors = bindingResult.getFieldErrors();
+                for (FieldError error : errors) {
+                    errorMessages += error.getDefaultMessage() + "; ";
+                }
+
+                baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+                baseResponseDTO.setMessage(errorMessages);
+                baseResponseDTO.setTimestamp(new Date());
+                return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
             }
 
-            baseResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
-            baseResponseDTO.setMessage(errorMessages);
+            AppointmentResponseDTO appointment = appointmentRestService.addAppointment(appointmentDTO);
+            if (appointment == null) {
+                baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
+                baseResponseDTO.setMessage("Data appointment tidak ditemukan");
+                baseResponseDTO.setTimestamp(new Date());
+                return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+            }
+
+            baseResponseDTO.setStatus(HttpStatus.CREATED.value());
+            baseResponseDTO.setData(appointment);
+            baseResponseDTO.setMessage(String.format("Appointment dengan ID %s berhasil ditambahkan", appointment.getId()));
             baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.BAD_REQUEST);
-        }
 
-        AppointmentResponseDTO appointment = appointmentRestService.addAppointment(appointmentDTO);
-        if (appointment == null) {
-            baseResponseDTO.setStatus(HttpStatus.NOT_FOUND.value());
-            baseResponseDTO.setMessage("Data appointment tidak ditemukan");
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.CREATED);
+
+        } catch (SecurityException e) {
+            // Handle unauthorized access (401)
+            baseResponseDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
+            baseResponseDTO.setMessage("Unauthorized: You do not have permission to delete this appointment.");
             baseResponseDTO.setTimestamp(new Date());
-            return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            // Handle server errors (500)
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Internal Server Error: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        baseResponseDTO.setStatus(HttpStatus.CREATED.value());
-        baseResponseDTO.setData(appointment);
-        baseResponseDTO.setMessage(String.format("Appointment dengan ID %s berhasil ditambahkan", appointment.getId()));
-        baseResponseDTO.setTimestamp(new Date());
-
-        return new ResponseEntity<>(baseResponseDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("{idAppointment}/delete")
@@ -117,7 +144,7 @@ public class AppointmentRestController {
         var baseResponseDTO = new BaseResponseDTO<List<AppointmentResponseDTO>>();
 
         try {
-            Appointment appt = appointmentRestService.deleteAppointment(idAppointment);
+            appointmentRestService.deleteAppointment(idAppointment);
             baseResponseDTO.setStatus(HttpStatus.OK.value());
             baseResponseDTO.setMessage(String.format("Appointment dengan ID %s berhasil dihapus", idAppointment));
             baseResponseDTO.setTimestamp(new Date());
@@ -129,6 +156,19 @@ public class AppointmentRestController {
             baseResponseDTO.setMessage(String.format(e.getMessage()));
             baseResponseDTO.setTimestamp(new Date());
             return new ResponseEntity<>(baseResponseDTO, HttpStatus.NOT_FOUND);
+        } catch (SecurityException e) {
+            // Handle unauthorized access (401)
+            baseResponseDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
+            baseResponseDTO.setMessage("Unauthorized: You do not have permission to delete this appointment.");
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            // Handle server errors (500)
+            baseResponseDTO.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            baseResponseDTO.setMessage("Internal Server Error: " + e.getMessage());
+            baseResponseDTO.setTimestamp(new Date());
+            return new ResponseEntity<>(baseResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
