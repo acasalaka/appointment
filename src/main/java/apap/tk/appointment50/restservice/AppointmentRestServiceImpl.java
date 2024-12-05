@@ -12,6 +12,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -82,6 +84,10 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         newAppointment.setCreatedAt(new Date());
         newAppointment.setUpdatedAt(new Date());
         newAppointment.setDeleted(false);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        newAppointment.setCreatedBy(username);
+        newAppointment.setUpdatedBy(username);
         newAppointment.setId(appointmentService.generateAppointmentId(newAppointment));
 
         appointmentDb.save(newAppointment);
@@ -116,6 +122,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
 
             appointment.setId(appointmentDTO.getId());
             appointment.setStatus(appointmentDTO.getStatus());
+            appointment.setUpdatedBy(appointmentDTO.getUpdatedBy());
 
             var updateAppointment = appointmentDb.save(appointment);
             return appointmentToAppointmentResponseDTO(updateAppointment);
@@ -144,6 +151,7 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         }
         appointment.setTotalFee(totalFee);
         appointment.setTreatments(treatments);
+        appointment.setUpdatedBy(appointmentDTO.getUpdatedBy());
 
         var updateAppointment = appointmentDb.save(appointment);
         return appointmentToAppointmentResponseDTO(updateAppointment);
@@ -213,6 +221,10 @@ public class AppointmentRestServiceImpl implements AppointmentRestService {
         responseDTO.setStatus(appointmentService.statusString(appointment.getStatus()));
         responseDTO.setCreatedAt(appointment.getCreatedAt());
         responseDTO.setUpdatedAt(appointment.getUpdatedAt());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        responseDTO.setCreatedBy(username);
+        responseDTO.setUpdatedBy(username);
 
         return responseDTO;
     }

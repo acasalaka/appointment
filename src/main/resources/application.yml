@@ -1,4 +1,6 @@
 spring:
+    main:
+        allow-circular-references: true
     application:
         name: appointment50
     datasource:
@@ -16,3 +18,7 @@ spring:
             ddl-auto: update
 server:
     port: 8081
+appointment50:
+    app:
+        jwtSecret: "hPjbJwZKskRmCnzroyAZfglqSKexYmxKeYPvSvJ"
+        jwtExpirationMs: 86400000

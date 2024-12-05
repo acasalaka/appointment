@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class UpdateAppointmentStatusRequestRestDTO {
     private String id;
     private int status;
+    private String updatedBy;
 }

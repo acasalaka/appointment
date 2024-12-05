@@ -13,4 +13,5 @@ public class UpdateAppointmentDiagnosisAndTreatmentRequestRestDTO {
     private String id;
     private String diagnosis;
     private List<Long> treatments;
+    private String updatedBy;
 }

@@ -13,25 +13,30 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AppointmentResponseDTO {
-    private String id;
-    private String doctorName;
-    private String patientName;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
+public class UserResponseDTO {
+    private UUID id;
+    private String name;
+    private String username;
+    private String password;
+    private String email;
+    private String gender;
+    private String role;
+    private String nik;
+    private String birthPlace;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date date;
-    private String diagnosis;
-    private List<String> treatments;
-    private Long totalFee;
-    private String status;
+    private Date birthDate;
+    private int pClass;
+    private int specialist;
+    private int yearsOfExperience;
+    private Long fee;
+    private List<Integer> schedules;
+
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, timezone="Asia/Jakarta")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date updatedAt;
-    private String createdBy;
-    private String updatedBy;
+    private boolean isDeleted;
 }

@@ -66,6 +66,12 @@ public class Appointment {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
+    @Column(name = "created_by", updatable = false, nullable = false)
+    private String createdBy;
+
+    @Column(name = "updated_by", nullable = false)
+    private String updatedBy;
+
     @NotNull
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
