@@ -41,7 +41,7 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("api/appointment/all").hasAnyAuthority("ADMIN", "NURSE")
+                        .requestMatchers("api/appointment/viewall").hasAnyAuthority("ADMIN", "NURSE")
                         .requestMatchers("api/appointment").hasAnyAuthority("ADMIN", "DOCTOR", "NURSE", "PATIENT")
                         .requestMatchers("api/appointment/by-doctor").hasAuthority("DOCTOR")
                         .requestMatchers("api/appointment/by-patient").hasAuthority("PATIENT")
